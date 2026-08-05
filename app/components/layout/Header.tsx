@@ -10,7 +10,6 @@ interface HeaderProps {
 
 const Header = ({ user }: HeaderProps) => {
   const pathname = usePathname();
-  const user1 = false;
   const navigation = [
     { name: "Home", href: "/", show: true },
     { name: "Dashboard", href: "/dashboard", show: true },
