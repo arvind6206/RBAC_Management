@@ -6,7 +6,7 @@ const MainLayout = async ({children}: {children: React.ReactNode}) => {
   const user = await apiClient.getCurrentUser()
   return (
     <div>
-      <Header user={user}/>
+      <Header user={user ?? null}/>
       <main className='container mx-auto px-4 py-8'>{children}</main>
     </div>
   )
