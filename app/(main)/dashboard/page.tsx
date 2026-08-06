@@ -1,0 +1,22 @@
+import { getCurrentUSer } from "@/app/lib/auth"
+import { Role } from "@/app/types"
+import { redirect } from "next/navigation"
+
+const DashboardLayout = async () => {
+    const user = await getCurrentUSer()
+    if(!user){
+        redirect("/login")
+    }
+
+    switch(user.role){
+        case Role.ADMIN:
+            redirect("/dashboard/admin")
+        case Role.MANAGER:
+            redirect("/dashboard/manager")
+        case Role.USER:
+            redirect("/dashboard/user")
+        default:
+            redirect("/dashboard/user")
+    }
+}
+export default DashboardLayout
