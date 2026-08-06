@@ -12,18 +12,40 @@ const ManagerPage = async () => {
   //fetch manager's own team member
   const prismaMyTeamMembers = user.teamId ?
     prisma.user.findMany({
-        
-    }, {
+        where: {
+            teamId: user.teamId,
+            role: {not: Role.ADMIN}
+        },
       include: {
         team: true,
       },
-      orderBy: {
-        createdAt: "desc",
+    
+    }) : [];
+
+    //fetch all team members(cross team view-exclude sensiive fields)
+    const prismaAllTeamMembers = 
+            prisma.user.findMany({
+        where: {
+            role: {not: Role.ADMIN}
+        },
+      include: {
+        team: {
+            select: {
+                id: true,
+                name: true,
+                code: true,
+                description: true
+            }
+        },
+        orderBy: {
+            teamId: "desc",
+        }
       },
-    }) : ()
+    
+    })
   
   return (
-    <AdminDashboard users={prismaUser} teams={prismaTeams} currentUser={user} />
+    <ManagerDashboard myTeamMembers={prismaMyTeamMembers} allTeamMembers={prismaAllTeamMembers} currentUser={user} />
   );
 };
 

@@ -1,9 +1,9 @@
 import React from 'react'
 import Header from '../components/layout/Header'
-import { apiClient } from '../lib/apiClient'
+import { getCurrentUSer } from '../lib/auth'
 
 const MainLayout = async ({children}: {children: React.ReactNode}) => {
-  const user = await apiClient.getCurrentUser()
+  const user = await getCurrentUSer()
   return (
     <div>
       <Header user={user ?? null}/>
