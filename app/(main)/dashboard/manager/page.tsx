@@ -1,17 +1,19 @@
+import ManagerDashboard from "@/app/components/dashboard/ManagerDashboard";
 import { checkUserPermission, getCurrentUSer } from "@/app/lib/auth";
 import { prisma } from "@/app/lib/db";
-import { Role } from "@/app/types";
+import { transformUsers } from "@/app/lib/util";
+import { Role, User } from "@/app/types";
 import { redirect } from "next/navigation";
 
 const ManagerPage = async () => {
   const user = await getCurrentUSer();
-  if (!user || !checkUserPermission(user, Role.ADMIN)) {
+  if (!user || !checkUserPermission(user, Role.MANAGER)) {
     redirect("/unauthorized");
   }
 
   //fetch manager's own team member
   const prismaMyTeamMembers = user.teamId ?
-    prisma.user.findMany({
+    await prisma.user.findMany({
         where: {
             teamId: user.teamId,
             role: {not: Role.ADMIN}
@@ -24,7 +26,7 @@ const ManagerPage = async () => {
 
     //fetch all team members(cross team view-exclude sensiive fields)
     const prismaAllTeamMembers = 
-            prisma.user.findMany({
+            await prisma.user.findMany({
         where: {
             role: {not: Role.ADMIN}
         },
@@ -37,15 +39,19 @@ const ManagerPage = async () => {
                 description: true
             }
         },
+      },
+
+        
         orderBy: {
             teamId: "desc",
         }
-      },
     
     })
+    const myTeamMembers = transformUsers(prismaMyTeamMembers)
+      const allTeamMembers = transformUsers(prismaAllTeamMembers)
   
   return (
-    <ManagerDashboard myTeamMembers={prismaMyTeamMembers} allTeamMembers={prismaAllTeamMembers} currentUser={user} />
+    <ManagerDashboard myTeamMembers={myTeamMembers as User[]} allTeamMembers={allTeamMembers as User[]} currentUser={user} />
   );
 };
 
